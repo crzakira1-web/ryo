@@ -17,14 +17,14 @@
       color: #fff; 
     }
     h1 {
-      margin-bottom: 24px;
+      margin-bottom: 12px;
       color: #ef4444;
       letter-spacing: 3px;
       text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
     }
     p {
       color: #888;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       font-size: 14px;
       letter-spacing: 1px;
     }
@@ -85,14 +85,14 @@ async function generateMcpack() {
       "name": "RYO Performance Pack [RP]",
       "description": "find it out yourself",
       "uuid": "7c4f230d-5f9c-4e62-b071-022f9710cc3b",
-      "version": [5, 0, 0],
+      "version": [6, 0, 0],
       "min_engine_version": [1, 20, 0]
     },
     "modules": [
       {
         "type": "resources",
         "uuid": "3f0a25g9-2231-4b90-cd81-913d7810cc3b",
-        "version": [5, 0, 0]
+        "version": [6, 0, 0]
       }
     ]
   };
@@ -100,7 +100,7 @@ async function generateMcpack() {
   packZip.file("manifest.json", JSON.stringify(manifest, null, 2));
   packZip.file("pack_icon.png", iconBase64, {base64: true});
 
-  // Exhaustive particle culling purge for zero GPU render overhead
+  // Purge all background particles including regular and colored fireworks, water splash, and underwater fog
   const particlesFolder = packZip.folder("particles");
   const particleList = [
     "minecraft:critical_hit_emitter", "minecraft:huge_explosion_emitter",
@@ -116,7 +116,7 @@ async function generateMcpack() {
     particlesFolder.file(p.replace("minecraft:", "") + ".json", JSON.stringify(createZeroParticle(p), null, 2));
   });
 
-  // Maximized water and lava clear vision bounds
+  // Complete water and lava vision clearance
   const renderSettings = {
     "format_version": "1.16.0",
     "minecraft:client_environment": {

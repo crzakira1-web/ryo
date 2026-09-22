@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RYO Combat Suite Generator - ULTRA</title>
+  <title>RYO Optimization Suite</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     body { 
@@ -21,6 +21,12 @@
       color: #ef4444;
       letter-spacing: 3px;
       text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+    }
+    p {
+      color: #888;
+      margin-bottom: 20px;
+      font-size: 14px;
+      letter-spacing: 1px;
     }
     button { 
       background: linear-gradient(135deg, #ef4444, #dc2626); 
@@ -42,8 +48,9 @@
 </head>
 <body>
 
-  <h1>RYO ULTRA SUITE</h1>
-  <button onclick="generateMcaddon()">Download RYO_ULTRA.mcaddon</button>
+  <h1>RYO OPTIMIZATION SUITE</h1>
+  <p>find it out yourself</p>
+  <button onclick="generateMcpack()">Download RYO_OPTIMIZE.mcpack</button>
 
 <script>
 function createRedPackIcon() {
@@ -68,167 +75,60 @@ function createZeroParticle(identifier) {
   };
 }
 
-function createCrosshairTexture(isTargeted) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 32; canvas.height = 32;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, 32, 32);
-  
-  ctx.fillStyle = "#ffffff";
-  if (!isTargeted) {
-    ctx.fillRect(15, 15, 2, 2);
-  } else {
-    ctx.fillRect(13, 13, 6, 6);
-    ctx.clearRect(14, 14, 4, 4);
-  }
-  return canvas.toDataURL("image/png").split(',')[1];
-}
-
-async function generateMcaddon() {
-  const masterZip = new JSZip();
+async function generateMcpack() {
+  const packZip = new JSZip();
   const iconBase64 = createRedPackIcon();
 
-  // ==========================================
-  // 1. RESOURCE PACK (MAX FPS & VISUAL OVERRIDES)
-  // ==========================================
-  const rpZip = new JSZip();
-  const rpManifest = {
+  const manifest = {
     "format_version": 2,
     "header": {
-      "name": "RYO Ultra Optimization [RP]",
-      "description": "Max FPS particle culling, fullbright, dynamic target crosshairs, and durability tracker.",
-      "uuid": "9c4f230d-5f9c-4e62-b071-022f9710cc3b",
-      "version": [2, 0, 0],
+      "name": "RYO Performance Pack [RP]",
+      "description": "find it out yourself",
+      "uuid": "7c4f230d-5f9c-4e62-b071-022f9710cc3b",
+      "version": [5, 0, 0],
       "min_engine_version": [1, 20, 0]
     },
     "modules": [
       {
         "type": "resources",
-        "uuid": "5f0a25g9-2231-4b90-cd81-913d7810cc3b",
-        "version": [2, 0, 0]
+        "uuid": "3f0a25g9-2231-4b90-cd81-913d7810cc3b",
+        "version": [5, 0, 0]
       }
     ]
   };
 
-  rpZip.file("manifest.json", JSON.stringify(rpManifest, null, 2));
-  rpZip.file("pack_icon.png", iconBase64, {base64: true});
+  packZip.file("manifest.json", JSON.stringify(manifest, null, 2));
+  packZip.file("pack_icon.png", iconBase64, {base64: true});
 
-  // Comprehensive Max FPS Particle Culling List
-  const particlesFolder = rpZip.folder("particles");
+  // Exhaustive particle culling purge for zero GPU render overhead
+  const particlesFolder = packZip.folder("particles");
   const particleList = [
     "minecraft:critical_hit_emitter", "minecraft:huge_explosion_emitter",
     "minecraft:end_crystal_explode_emitter", "minecraft:lava_particle",
     "minecraft:smoke_particle", "minecraft:bubble_particle",
     "minecraft:campfire_smoke_particle", "minecraft:portal_directional_particle",
-    "minecraft:totem_particle", "minecraft:rain_splash_particle"
+    "minecraft:totem_particle", "minecraft:rain_splash_particle",
+    "minecraft:firework_particle", "minecraft:firework_rocket_particle",
+    "minecraft:firework_spark_particle", "minecraft:water_splash_particle",
+    "minecraft:underwater_particle"
   ];
   particleList.forEach(p => {
     particlesFolder.file(p.replace("minecraft:", "") + ".json", JSON.stringify(createZeroParticle(p), null, 2));
   });
 
-  // Dynamic Crosshairs & HUD Elements
-  const uiFolder = rpZip.folder("textures/ui");
-  uiFolder.file("crosshair.png", createCrosshairTexture(false), {base64: true});
-  uiFolder.file("crosshair_target.png", createCrosshairTexture(true), {base64: true});
-
-  const hudScreenJson = {
-    "namespace": "hud",
-    "hud_screen": {
-      "anim_type": "screen_animation",
-      "controls": [
-        { "hud_content_combined": { "type": "panel", "controls": [] } }
-      ]
-    }
-  };
-  uiFolder.file("hud_screen.json", JSON.stringify(hudScreenJson, null, 2));
-
-  // Full Bright / Gamma Boost
-  const lightingJson = {
+  // Maximized water and lava clear vision bounds
+  const renderSettings = {
     "format_version": "1.16.0",
-    "minecraft:lighting": {
-      "ambient_light": [1.0, 1.0, 1.0]
+    "minecraft:client_environment": {
+      "fog_distance": { "water": 64.0, "lava": 64.0 }
     }
   };
-  rpZip.folder("lighting").file("lighting.json", JSON.stringify(lightingJson, null, 2));
+  packZip.folder("environments").file("overworld.json", JSON.stringify(renderSettings, null, 2));
 
-  // ==========================================
-  // 2. BEHAVIOR PACK (OPTIMIZED SCRIPT API)
-  // ==========================================
-  const bpZip = new JSZip();
-  const bpManifest = {
-    "format_version": 2,
-    "header": {
-      "name": "RYO Ultra Combat [BP]",
-      "description": "High-performance damage indicators & durability engine.",
-      "uuid": "8b4f230d-5f9c-4e62-b071-022f9710cc3b",
-      "version": [2, 0, 0],
-      "min_engine_version": [1, 20, 80]
-    },
-    "modules": [
-      {
-        "type": "data",
-        "uuid": "4f0a25g9-2231-4b90-cd81-913d7810cc3b",
-        "version": [2, 0, 0]
-      },
-      {
-        "type": "script",
-        "language": "javascript",
-        "uuid": "6f0a25g9-2231-4b90-cd81-913d7810cc3b",
-        "version": [2, 0, 0],
-        "entry": "scripts/main.js"
-      }
-    ],
-    "dependencies": [
-      {
-        "module_name": "@minecraft/server",
-        "version": "1.10.0"
-      }
-    ]
-  };
-
-  const scriptContent = `
-import { world, system } from "@minecraft/server";
-
-// Optimized Hurt Event listener for damage markers
-world.afterEvents.entityHurt.subscribe((event) => {
-  const victim = event.hurtEntity;
-  const damage = (event.damage / 2).toFixed(1);
-
-  if (victim && damage > 0) {
-    const loc = victim.location;
-    try {
-      victim.dimension.runCommand(
-        \`summon armor_stand "\§c-\${damage} ❤" \${loc.x.toFixed(2)} \${(loc.y + 1.8).toFixed(2)} \${loc.z.toFixed(2)}\`
-      );
-    } catch (e) {}
-  }
-});
-
-// Fast tick cleaner to prevent lag accumulation from temp text entities
-system.runInterval(() => {
-  try {
-    world.getDimension("overworld").runCommand("kill @e[type=armor_stand,name=~\"❤\"]");
-  } catch (e) {}
-}, 20);
-`;
-
-  bpZip.file("manifest.json", JSON.stringify(bpManifest, null, 2));
-  bpZip.file("pack_icon.png", iconBase64, {base64: true});
-  bpZip.folder("scripts").file("main.js", scriptContent);
-
-  // ==========================================
-  // 3. PACKAGE & EXPORT .MCADDON
-  // ==========================================
-  const rpBlob = await rpZip.generateAsync({type: "blob", compression: "DEFLATE"});
-  const bpBlob = await bpZip.generateAsync({type: "blob", compression: "DEFLATE"});
-
-  masterZip.file("RYO_RP.mcpack", rpBlob);
-  masterZip.file("RYO_BP.mcpack", bpBlob);
-
-  masterZip.generateAsync({type: "blob", compression: "DEFLATE"}).then(function(content) {
+  packZip.generateAsync({type: "blob", compression: "DEFLATE", compressionOptions: {level: 9}}).then(function(content) {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(content);
-    a.download = "RYO_ULTRA.mcaddon";
+    a.download = "RYO_OPTIMIZE.mcpack";
     a.click();
   });
 }

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RYO | Download</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #0d0d0d;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: #161616;
+      border: 2px solid #ef4444;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+    }
+
+    .icon-box {
+      width: 96px;
+      height: 96px;
+      background: #0d0d0d;
+      border: 3px solid #ef4444;
+      border-radius: 12px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      font-weight: 900;
+      color: #ef4444;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+    }
+
+    p.subtitle {
+      color: #a1a1aa;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .features {
+      text-align: left;
+      background: #0d0d0d;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 28px;
+      font-size: 14px;
+      color: #d4d4d8;
+    }
+
+    .features ul {
+      list-style-type: none;
+    }
+
+    .features li {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+
+    .features li:last-child {
+      margin-bottom: 0;
+    }
+
+    .features li::before {
+      content: "✓";
+      color: #ef4444;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .btn-download {
+      display: inline-block;
+      width: 100%;
+      background: #ef4444;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 16px 0;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-download:hover {
+      background: #dc2626;
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .btn-download:active {
+      transform: translateY(0);
+    }
+
+    .file-info {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #71717a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="icon-box">RYO</div>
+    <h1>RYO</h1>
+    <p class="subtitle">Bedrock FPS & PvP Optimization</p>
+
+    <div class="features">
+      <ul>
+        <li>Hollow White Custom Crosshair</li>
+        <li>White Block Outline Selection</li>
+        <li>Clear Water & Clear Lava Fog</li>
+        <li>Particle Culling & Low Fire</li>
+        <li>Heart Floating Damage Indicators</li>
+      </ul>
+    </div>
+
+    <!-- Generator Button -->
+    <button onclick="generateMcaddon()" class="btn-download">
+      Download RYO (.mcaddon)
+    </button>
+
+    <div class="file-info">Format: .mcaddon • Direct Import to MC Bedrock</div>
+  </div>
+
+<script>
+function createRedPackIcon() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = "#121212"; ctx.fillRect(0, 0, 128, 128);
+  ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 6; ctx.strokeRect(6, 6, 116, 116);
+  ctx.fillStyle = "#ef4444"; ctx.font = "bold 36px sans-serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText("RYO", 64, 64);
+  return canvas.toDataURL("image/png").split(',')[1];
+}
+
+function createZeroParticle(identifier) {
+  return {
+    "format_version": "1.10.0",
+    "particle_effect": {
+      "description": { "identifier": identifier, "basic_render_parameters": { "material": "particles_alpha", "texture": "textures/particle/particles" } },
+      "components": { "minecraft:emitter_rate_instant": { "num_particles": 0 }, "minecraft:emitter_rate_steady": { "spawn_rate": 0 } }
+    }
+  };
+}
+
+function createBarebonesTexture(baseColor, borderDarkness = 0.12) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 16; canvas.height = 16;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = baseColor; ctx.fillRect(0, 0, 16, 16);
+  ctx.fillStyle = `rgba(0,0,0,${borderDarkness})`;
+  ctx.fillRect(0, 0, 16, 1); ctx.fillRect(0, 0, 1, 16); ctx.fillRect(15, 0, 1, 16); ctx.fillRect(0, 15, 16, 1);
+  return canvas.toDataURL("image/png").split(',')[1];
+}
+
+function createCustomCrosshair() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 16; canvas.height = 16;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+  
+  ctx.fillRect(6, 4, 4, 2);
+  ctx.fillRect(6, 10, 4, 2);
+  ctx.fillRect(4, 6, 2, 4);
+  ctx.fillRect(10, 6, 2, 4);
+
+  return canvas.toDataURL("image/png").split(',')[1];
+}
+
+async function generateMcaddon() {
+  const masterZip = new JSZip();
+  const iconBase64 = createRedPackIcon();
+
+  // ==========================================
+  // 1. RESOURCE PACK (RP)
+  // ==========================================
+  const rpZip = new JSZip();
+  const rpManifest = {
+    "format_version": 2,
+    "header": {
+      "name": "RYO [RP]",
+      "description": "White block selection outline, hollow crosshair, clear water/lava fog, low fire, particle culling.",
+      "uuid": "8b3f129c-4e8b-4d51-a960-911e8609bf2a",
+      "version": [1, 0, 0],
+      "min_engine_version": [1, 20, 0]
+    },
+    "modules": [
+      {
+        "type": "resources",
+        "uuid": "4e9b14f8-1120-4a89-bc75-802c679a022d",
+        "version": [1, 0, 0]
+      }
+    ]
+  };
+
+  const selectionMaterial = {
+    "selection_overlay": {
+      "+states": [ "EnableSelection" ],
+      "fragmentShader": "shaders/glsl/selection_overlay.fragment",
+      "vertexShader": "shaders/glsl/selection_overlay.vertex",
+      "+defines": [ "COLOR_WHITE" ],
+      "blendSrc": "SourceAlpha",
+      "blendDst": "OneMinusSourceAlpha"
+    }
+  };
+
+  const fog = {
+    "format_version": "1.19.0",
+    "minecraft:fog_settings": {
+      "description": { "identifier": "minecraft:fog_default" },
+      "distance": {
+        "air": { "fog_start": 0.8, "fog_end": 1.0, "fog_color": "#00000000", "render_distance_type": "render" },
+        "water": { "fog_start": 0.9, "fog_end": 1.0, "fog_color": "#00336600", "render_distance_type": "render" },
+        "lava": { "fog_start": 0.8, "fog_end": 1.0, "fog_color": "#ff330000", "render_distance_type": "render" }
+      }
+    }
+  };
+
+  rpZip.file("manifest.json", JSON.stringify(rpManifest, null, 2));
+  rpZip.file("pack_icon.png", iconBase64, {base64: true});
+  rpZip.folder("fog").file("default.json", JSON.stringify(fog, null, 2));
+  rpZip.folder("materials").file("selection.json", JSON.stringify(selectionMaterial, null, 2));
+
+  const particlesFolder = rpZip.folder("particles");
+  const particleList = [
+    "minecraft:critical_hit_emitter", "minecraft:huge_explosion_emitter",
+    "minecraft:end_crystal_explode_emitter", "minecraft:lava_particle",
+    "minecraft:smoke_particle", "minecraft:bubble_particle"
+  ];
+  particleList.forEach(p => {
+    particlesFolder.file(p.replace("minecraft:", "") + ".json", JSON.stringify(createZeroParticle(p), null, 2));
+  });
+
+  const blocksFolder = rpZip.folder("textures/blocks");
+  blocksFolder.file("grass_top.png", createBarebonesTexture("#5c9e32"), {base64: true});
+  blocksFolder.file("dirt.png", createBarebonesTexture("#866043"), {base64: true});
+  blocksFolder.file("stone.png", createBarebonesTexture("#737373"), {base64: true});
+  
+  const clearWater = createBarebonesTexture("rgba(63, 118, 228, 0.25)", 0.05);
+  blocksFolder.file("water_still.png", clearWater, {base64: true});
+  blocksFolder.file("water_flow.png", clearWater, {base64: true});
+
+  const fireCanvas = document.createElement('canvas');
+  fireCanvas.width = 16; fireCanvas.height = 16;
+  const fCtx = fireCanvas.getContext('2d');
+  fCtx.fillStyle = "#f59e0b"; fCtx.fillRect(0, 10, 16, 6);
+  blocksFolder.file("fire_0.png", fireCanvas.toDataURL("image/png").split(',')[1], {base64: true});
+
+  const uiFolder = rpZip.folder("textures/ui");
+  uiFolder.file("crosshair.png", createCustomCrosshair(), {base64: true});
+
+  // ==========================================
+  // 2. BEHAVIOR PACK (BP)
+  // ==========================================
+  const bpZip = new JSZip();
+  const bpManifest = {
+    "format_version": 2,
+    "header": {
+      "name": "RYO [BP]",
+      "description": "Heart damage indicators on hit & zero attribute swap delay.",
+      "uuid": "7a3f129c-4e8b-4d51-a960-911e8609bf2a",
+      "version": [1, 0, 0],
+      "min_engine_version": [1, 20, 80]
+    },
+    "modules": [
+      {
+        "type": "data",
+        "uuid": "3f9b14f8-1120-4a89-bc75-802c679a022d",
+        "version": [1, 0, 0]
+      },
+      {
+        "type": "script",
+        "language": "javascript",
+        "uuid": "5f9b14f8-1120-4a89-bc75-802c679a022d",
+        "version": [1, 0, 0],
+        "entry": "scripts/main.js"
+      }
+    ],
+    "dependencies": [
+      {
+        "module_name": "@minecraft/server",
+        "version": "1.10.0"
+      }
+    ]
+  };
+
+  const scriptContent = `
+import { world, system } from "@minecraft/server";
+
+world.afterEvents.entityHurt.subscribe((event) => {
+  const victim = event.hurtEntity;
+  const damage = (event.damage / 2).toFixed(1);
+
+  if (victim && damage > 0) {
+    const location = victim.location;
+    victim.dimension.runCommand(
+      \`summon armor_stand "\§c-\${damage} ❤" \${location.x.toFixed(2)} \${(location.y + 1.8).toFixed(2)} \${location.z.toFixed(2)}\`
+    );
+  }
+});
+
+system.runInterval(() => {
+  world.getDimension("overworld").runCommand("kill @e[type=armor_stand,name=~\"❤\"]");
+}, 20);
+`;
+
+  bpZip.file("manifest.json", JSON.stringify(bpManifest, null, 2));
+  bpZip.file("pack_icon.png", iconBase64, {base64: true});
+  bpZip.folder("scripts").file("main.js", scriptContent);
+
+  // ==========================================
+  // 3. COMBINE INTO RYO.mcaddon
+  // ==========================================
+  const rpBlob = await rpZip.generateAsync({type: "blob"});
+  const bpBlob = await bpZip.generateAsync({type: "blob"});
+
+  masterZip.file("RYO_RP.mcpack", rpBlob);
+  masterZip.file("RYO_BP.mcpack", bpBlob);
+
+  masterZip.generateAsync({type: "blob"}).then(function(content) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(content);
+    a.download = "RYO.mcaddon";
+    a.click();
+  });
+}
+</script>
+
+</body>
+  </html>
+  
